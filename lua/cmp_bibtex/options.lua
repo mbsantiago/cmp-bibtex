@@ -26,7 +26,7 @@ options.defaults = {
   search_fields = { "title", "author", "abstract" },
   doc_fields = { "title", "author", "year", "journal", "abstract" },
   info_in_window = true,
-  symbols_in_menu = false,
+  symbols_in_menu = true,
 }
 
 

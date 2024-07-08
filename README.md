@@ -73,4 +73,4 @@ require('cmp').setup({
 
 Inspired by [`cmp-vimtex`](https://github.com/micangl/cmp-vimtex), this plugin builds upon its core concepts while adapting to typst's specific needs.
 The main change is the use of [treesitter](https://github.com/nvim-treesitter/nvim-treesitter) to parse the document and extract the bibliography entries.
-Timer implementation is borrowed from [cmp-buffer](https://github.com/hrsh7th/cmp-buffer).
+Timer implementation is borrowed from [`cmp-buffer`](https://github.com/hrsh7th/cmp-buffer).

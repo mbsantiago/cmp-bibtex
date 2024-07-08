@@ -18,14 +18,13 @@ options.defaults = {
 ---@return cmp_bibtex.Options
 function options.validate(opts)
   opts = vim.tbl_deep_extend("keep", opts or {}, options.defaults)
-  --- TODO: Update this
-  -- vim.validate({
-  --   keyword_pattern = { opts.keyword_pattern, "string" },
-  --   trigger_characters = { opts.trigger_characters, "table" },
-  --   info_in_window = { opts.info_in_window, "boolean" },
-  --   info_max_length = { opts.info_max_length, "number" },
-  --   symbols_in_menu = { opts.symbols_in_menu, "boolean" },
-  -- })
+  vim.validate({
+    cite_key_search = { opts.cite_key_search, "boolean" },
+    search_fields = { opts.search_fields, "table" },
+    doc_fields = { opts.doc_fields, "table" },
+    info_in_window = { opts.info_in_window, "boolean" },
+    symbols_in_menu = { opts.symbols_in_menu, "boolean" },
+  })
   return opts
 end
 

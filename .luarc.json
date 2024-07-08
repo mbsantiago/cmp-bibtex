@@ -3,19 +3,9 @@
   "runtime": {
     "version": "LuaJIT"
   },
-  "workspace": {
-    "library": [
-      "$VIMRUNTIME",
-      "${3rd}/luv/library"
-    ],
-    "checkThirdParty": false
-  },
-    "diagnostics.disable": [
-        "unused-function",
-        "unused-local"
-    ],
-    "diagnostics.globals": [
-        "extract_bib_data",
-        "logger"
-    ]
+  "format.enable": false,
+  "diagnostics.globals": [
+    "extract_bib_data",
+    "logger"
+  ]
 }

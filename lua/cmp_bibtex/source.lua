@@ -1,19 +1,18 @@
+--- cmp_bibtex.source Module
+-- Defines the BibTeX completion source for nvim-cmp.
+
 local path = require("cmp_bibtex.path")
 local parser = require("cmp_bibtex.parser")
 local options = require("cmp_bibtex.options")
 local utils = require("cmp_bibtex.formatting")
 
----@class cmp_bibtex.FileInfo
----@field path string Path to the file
----@field updated_on number Last time the file was updated
----@field indexed boolean Whether the file has been indexed
----@field indexed_on number|nil Last time the file was indexed
----@field processing boolean Whether the file is currently being processed
-
 ---@class cmp_bibtext.Source: cmp.Source
----@field parser cmp_bibtex.Parser
+---@field parser cmp_bibtex.Parser The BibTeX parser instance.
 local source = {}
 
+--- Constructor for the BibTeX source.
+-- Initializes the source and creates a new parser instance with the Git root
+-- directory as the base path.
 function source.new()
   local self = setmetatable({}, { __index = source })
   self.parser = parser.new(path.get_root())
@@ -25,6 +24,9 @@ function source.get_trigger_characters()
   return { "@" }
 end
 
+--- Retrieves the keyword pattern for BibTeX completion.
+-- Matches a pattern starting with '@' followed by alphanumeric characters.
+---@return string The keyword pattern.
 function source.get_keyword_pattern()
   return "[@][[:alnum:]]*"
 end
@@ -34,13 +36,18 @@ function source.get_position_encoding_kind()
   return "utf-8"
 end
 
----@return boolean
+--- Checks if the source is available for completion.
+-- Currently, the source is only available in 'typst' filetypes.
+---@return boolean True if available, false otherwise.
 function source:is_available()
   return vim.o.filetype == "typst"
 end
 
----@param params cmp.SourceCompletionApiParams
----@param callback fun(response?: lsp.CompletionList)
+--- Completes BibTeX entries based on the provided parameters.
+-- Updates the BibTeX file index, parses the entries, prepares completion items,
+-- and handles asynchronous completion based on the parser's readiness.
+---@param params cmp.SourceCompletionApiParams The completion parameters.
+---@param callback fun(response?: lsp.CompletionList) The callback function.
 function source:complete(params, callback)
   local opts = self:validate_options(params)
 
@@ -69,9 +76,10 @@ function source:complete(params, callback)
   end, ready and 0 or 100)
 end
 
+--- Validates the options passed to the source.
+---@param params cmp.SourceCompletionApiParams The completion parameters.
+---@return cmp_bibtex.Options The validated options.
 ---@private
----@param params cmp.SourceCompletionApiParams
----@return cmp_bibtex.Options
 function source:validate_options(params)
   return options.validate(params.option)
 end

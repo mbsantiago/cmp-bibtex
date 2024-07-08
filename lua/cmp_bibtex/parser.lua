@@ -1,3 +1,32 @@
+--- cmp_bibtex.parser Module
+-- This module handles parsing of BibTeX files. It provides functionality for:
+-- - Finding and tracking BibTeX files in a directory.
+-- - Parsing BibTeX entries into a structured format.
+-- - Maintaining an index of BibTeX entries for efficient lookups.
+
+---@class cmp_bibtex.BibTexEntry Class
+-- Represents a single BibTeX entry parsed from a file.
+---@field type string Type of the BibTeX entry (e.g., "article", "book").
+---@field bibtex_file string Path to the BibTeX file containing the entry.
+---@field cite_key string Unique citation key for the entry.
+---@field fields table<string, string> Table of field-value pairs (e.g.,
+-- "title", "author").
+
+---@class cmp_bibtex.FileInfo
+---@field path string Path to the file
+---@field updated_on number Last time the file was updated
+---@field indexed boolean Whether the file has been indexed
+---@field indexed_on number|nil Last time the file was indexed
+---@field processing boolean Whether the file is currently being processed
+
+---@class cmp_bibtex.Parser
+---@field private files table<string, cmp_bibtex.FileInfo>  Table of BibTeX
+-- file information.
+---@field private entries table<string, cmp_bibtex.BibTexEntry> Table of parsed
+-- BibTeX entries.
+---@field private root string Root directory where BibTeX files are searched.
+local parser = {}
+
 local path = require("cmp_bibtex.path")
 local timer = require("cmp_bibtex.timer")
 local api = vim.api
@@ -19,14 +48,9 @@ local field_query = ts.query.parse(
   ]]
 )
 
----@class cmp_bibtex.Parser
----@field private files table<string, cmp_bibtex.FileInfo>
----@field private entries table<string, cmp_bibtex.BibTexEntry>
----@field private root string
-local parser = {}
-
----@param root string
----@return cmp_bibtex.Parser
+--- Constructor for the Parser class.
+---@param root string Root directory for BibTeX files.
+---@return cmp_bibtex.Parser A new Parser instance.
 function parser.new(root)
   local self = setmetatable({}, { __index = parser })
   self.root = root
@@ -35,11 +59,14 @@ function parser.new(root)
   return self
 end
 
+--- Updates the list of BibTeX files and re-parses them if necessary.
 function parser:update()
   self:update_files()
   self:update_entries()
 end
 
+--- Checks if all BibTeX files have been parsed and indexed.
+---@return boolean True if all files are indexed, false otherwise.
 function parser:is_ready()
   for _, file in pairs(self.files) do
     if not file.indexed then
@@ -49,10 +76,13 @@ function parser:is_ready()
   return true
 end
 
+--- Retrieves the parsed BibTeX entries.
+---@return table<string, cmp_bibtex.BibTexEntry> Table of BibTeX entries.
 function parser:get_entries()
   return self.entries
 end
 
+--- Updates the list of BibTeX files, checking for new or modified files.
 ---@private
 function parser:update_files()
   local new_files = path.get_bib_files(self.root)
@@ -76,6 +106,7 @@ function parser:update_files()
   end
 end
 
+--- Parses unindexed BibTeX files and updates the `entries` table.
 ---@private
 function parser:update_entries()
   for _, file in pairs(self.files) do
@@ -87,8 +118,9 @@ function parser:update_entries()
   end
 end
 
+--- Asynchronously parses a BibTeX file.
+---@param file cmp_bibtex.FileInfo The file to process.
 ---@private
----@param file cmp_bibtex.FileInfo
 function parser:process_file(file)
   local t = timer.new()
   file.processing = true
@@ -109,20 +141,9 @@ function parser:process_file(file)
   end)
 end
 
----@class cmp_bibtex.BibTexEntry
----@field type string
----@field bibtex_file string
----@field cite_key string
----@field fields table<string, string>
-
----@class cmp_bibtex.BixTexBlock
----@field start_line number
----@field end_line number
----@field type string
----@field content string
-
----@param filename string
----@return cmp_bibtex.BibTexEntry[]
+--- Parses a BibTeX file and extracts BibTeX entries.
+---@param filename string Path to the BibTeX file.
+---@return cmp_bibtex.BibTexEntry[] Array of BibTeX entries.
 function parser.parse(filename)
   local bufnr = vim.api.nvim_create_buf(true, false)
 
